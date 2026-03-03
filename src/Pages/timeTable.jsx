@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getClassesRedux, getTimeTableRedux, getUserRedux } from "../../redux/getData";
 import { useMemo } from "react";
 import { useState } from "react";
-import { timeTable } from "../../../school-management-backend/model/schema";
 import { apiFunction } from "../../api/apiFunction";
 import { createTimeTableApi } from "../../api/apis";
 import Toast from "../Components/Toast";
