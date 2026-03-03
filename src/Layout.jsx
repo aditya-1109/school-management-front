@@ -1,11 +1,11 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Components/Sidebar';
 import Header from './Components/Header';
 import PageLoader from './Components/PageLoader';
 
-const Layout = ({ children }) => {
+const Layout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
     const [isLoading, setIsLoading] = React.useState(false);
     const location = useLocation();
@@ -44,7 +44,7 @@ const Layout = ({ children }) => {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.4 }}
                             >
-                                {children}
+                                <Outlet />
                             </motion.div>
                         )}
                     </AnimatePresence>

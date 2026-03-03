@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AddEventModal from '../Components/AddEventModal';
 import { Users, GraduationCap, Banknote, TrendingUp, UserPlus, FileText, Megaphone, AlertCircle, Clock, CheckCircle, XCircle, Calendar, Award, BookOpen, DollarSign } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
+import axios from "axios"
 
 const revenueData = [
   { name: 'Jan', amount: 4000, expenses: 2800 },
@@ -111,6 +112,11 @@ function Home() {
     return colors[color] || colors.slate;
   };
 
+  const handleApi = async()=>{
+    const response = await axios.post("http://localhost:3000/createNewUser");
+    console.log(response)
+  }
+
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
@@ -129,7 +135,7 @@ function Home() {
             <option value="month">This Month</option>
             <option value="year">This Year</option>
           </select>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+          <button onClick={handleApi} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
             Download Reports
           </button>
         </div>

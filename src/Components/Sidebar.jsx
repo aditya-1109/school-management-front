@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Sidebar = ({ isOpen, toggleSidebar }) => {
     const location = useLocation();
     // Initialize with the top-level group managed expanded
-    const [expandedGroups, setExpandedGroups] = useState(['finance']);
+    const [expandedGroups, setExpandedGroups] = useState(['Dashboard']);
 
     const toggleGroup = (groupId) => {
         setExpandedGroups(prev =>
@@ -34,75 +34,35 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     };
 
     const menuGroups = [
+
         {
             id: 'dashboard',
             title: 'Dashboard',
             icon: LayoutDashboard,
-            path: '/',
+            path: '/home',
             type: 'single'
         },
         {
-            id: 'principals',
-            title: 'Principals',
-            icon: UserPlus, // Using UserPlus as a placeholder, or maybe Shield
+            id: 'User Management',
+            title: 'User Management',
+            icon: UserPlus, 
             type: 'group',
             subMenus: [
-                { title: 'Directory', path: '/PrincipalManagement', icon: Users },
-                { title: 'Permissions', path: '/principals/permissions', icon: Shield },
-                { title: 'Reports Access', path: '/principals/reports', icon: FileText },
-                { title: 'Performance', path: '/principals/performance', icon: Activity },
-                { title: 'Communication', path: '/principals/communication', icon: Mail },
+                { title: 'Principal', path: '/home/userManagement/principal', icon: Users },
+                { title: 'Teacher', path: '/home/userManagement/teacher', icon:  UserCog },
+                { title: 'Student', path: '/home/userManagement/student', icon: Users },
+                { title: 'Parents', path: '/home/userManagement/parent', icon: UserCog },
+                { title: 'Public', path: '/home/userManagement/public', icon: Users },
             ]
         },
-        {
-            id: 'teachers',
-            title: 'Teachers',
-            icon: UserCog,
-            type: 'group',
-            subMenus: [
-                { title: 'Directory', path: '/TeacherManagement', icon: Users },
-                { title: 'Timetable', path: '/teachers/timetable', icon: CalendarCheck },
-                { title: 'Attendance', path: '/teachers/attendance', icon: ClipboardList },
-                { title: 'Leaves', path: '/teachers/leaves', icon: Calendar },
-                { title: 'Credentials', path: '/teachers/credentials', icon: Key },
-            ]
-        },
-        {
-            id: 'students',
-            title: 'Students',
-            icon: GraduationCap,
-            type: 'group',
-            subMenus: [
-                { title: 'Directory', path: '/StudentManagement', icon: Users },
-                { title: 'Attendance', path: '/students/attendance', icon: CalendarCheck },
-                { title: 'Promotion', path: '/students/promotion', icon: ChevronRight },
-                { title: 'Documents', path: '/students/documents', icon: FileText },
-                { title: 'ID Cards', path: '/students/id-cards', icon: CreditCard },
-                { title: 'Credentials', path: '/students/credentials', icon: Key },
-            ]
-        },
-        {
-            id: 'parents',
-            title: 'Parents',
-            icon: UsersRound,
-            type: 'group',
-            subMenus: [
-                { title: 'Directory', path: '/ParentManagement', icon: Users },
-                { title: 'Login Control', path: '/parents/login-control', icon: Key },
-                { title: 'Notifications', path: '/parents/notifications', icon: Bell },
-                { title: 'Activity Log', path: '/parents/activity', icon: Activity },
-            ]
-        },
+       
         {
             id: 'admissions',
             title: 'Admissions',
             icon: UserPlus,
-            type: 'group',
-            subMenus: [
-                { title: 'Dashboard', path: '/AdmissionManagement', icon: LayoutDashboard },
-                { title: 'Applications', path: '/admissions/applications', icon: ClipboardList },
-                { title: 'Forms', path: '/admissions/forms', icon: FileText },
-            ]
+            type: 'single',
+            path: '/home/AdmissionManagement'
+           
         },
         {
             id: 'academic',
@@ -110,19 +70,46 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             icon: School,
             type: 'group',
             subMenus: [
-                { title: 'Classes', path: '/classmateManagement', icon: Building2 },
-                { title: 'Exams', path: '/exams', icon: ClipboardList },
+                { title: 'Classes', path: '/home/classmateManagement', icon: Building2 },
+                { title: 'Course', path: '/home/exams', icon: ClipboardList },
+                { title: 'Time-Table', path: '/home/timetable', icon: Calendar },
             ]
         },
         {
             id: 'finance',
-            title: 'Finance',
+            title: 'Fee Management',
             icon: Banknote,
+            type: 'single',
+            path: "/home/FeeManagement",
+          
+        },
+        {
+            id: 'events',
+            title: 'Events Management',
+            icon: CalendarCheck,
+            type: 'single',
+            path: "/home/events",
+          
+        },
+        {
+            id: 'Communication',
+            title: 'Communication',
+            icon: Mail,
             type: 'group',
             subMenus: [
-                { title: 'Fee Management', path: '/FeeManagement', icon: Banknote },
-                { title: 'Salary Management', path: '/SalaryManagement', icon: CreditCard },
+                { title: 'BroadCast', path: '/home/communication/broadcast', icon: UserCog },
+                { title: 'Post', path: '/home/communication/post', icon: Bell },
+                { title: 'inbox', path: '/home/communication/inbox' , icon: Users}
+                
             ]
+        },
+        {
+            id: 'Attendance',
+            title: 'Attendance',
+            icon: CalendarCheck,
+            path: "/home/attendance",
+            type: 'single',
+            
         },
     ];
 
@@ -215,7 +202,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         <GraduationCap size={24} strokeWidth={3} />
                     </div>
                     <div >
-                        <h1 className="text-xl font-bold text-slate-800 leading-none">EduAdmin</h1>
+                        <h1 className="text-xl font-bold text-slate-800 leading-none">School Management Admin</h1>
                         <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Management</p>
                     </div>
                 </div>

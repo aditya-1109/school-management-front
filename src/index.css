@@ -85,3 +85,36 @@ body {
 .neu-icon-btn:active {
   box-shadow: var(--neumorphic-inset);
 }
+
+.input-style {
+  width: 100%;
+  border: 1px solid #cbd5e1; 
+  border-radius: 12px; 
+  padding: 10px 16px; 
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input-style:focus {
+  border-color: #2563eb; 
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); 
+}
+
+.file-style {
+  width: 100%;
+  font-size: 14px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.file-style:hover {
+  border-color: #2563eb; 
+}
+
