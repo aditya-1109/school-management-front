@@ -3,6 +3,9 @@ import AddEventModal from '../Components/AddEventModal';
 import { Users, GraduationCap, Banknote, TrendingUp, UserPlus, FileText, Megaphone, AlertCircle, Clock, CheckCircle, XCircle, Calendar, Award, BookOpen, DollarSign } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
 import axios from "axios"
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { getClassesRedux, getFeesRedux, getNewUserRedux, getUserRedux } from '../../redux/getData';
 
 const revenueData = [
   { name: 'Jan', amount: 4000, expenses: 2800 },
@@ -77,10 +80,60 @@ const StatCard = ({ title, value, icon, color, trend, footer, subtitle }) => (
 );
 
 function Home() {
+
+  const { users, classes, fees, newUsers } = useSelector((state) => state.getData)
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [events, setEvents] = useState(initialEvents);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (!users) {
+      dispatch(getUserRedux())
+    }
+    if (!classes) {
+      dispatch(getClassesRedux())
+    }
+    if (!fees) {
+      dispatch(getFeesRedux())
+    }
+    if (!newUsers) {
+      dispatch(getNewUserRedux())
+    }
+  }, [dispatch])
+
+  const getTotalFee = () => {
+    if (!users || !fees) return { totalFees: 0, pendingFee: 0 };
+
+    // ✅ Get only students
+    const students = users?.filter((u) => u.type === "student");
+
+    let totalFees = 0;
+    let pendingFee = 0;
+
+    students.forEach((stu) => {
+      if (!Array.isArray(stu.fees)) return;
+
+      stu.fees.forEach((fe) => {
+        const mainFee = fees?.find((f) => f.id == fe.feeId);
+        if (!mainFee) return;
+
+        const totalAmount = Number(mainFee.totalAmount) || 0;
+        const paidAmount = Number(fe.paidAmount) || 0;
+
+        totalFees += totalAmount;
+
+        if (fe.status === "pending") {
+          pendingFee += totalAmount - paidAmount;
+        }
+      });
+    });
+
+    return { totalFees, pendingFee };
+  };
+
 
   const handleSaveEvent = (eventData) => {
     if (editingEvent) {
@@ -112,10 +165,12 @@ function Home() {
     return colors[color] || colors.slate;
   };
 
-  const handleApi = async()=>{
+  const handleApi = async () => {
     const response = await axios.post("http://localhost:3000/createNewUser");
     console.log(response)
   }
+
+  console.log(newUsers)
 
   return (
     <div className="space-y-8">
@@ -145,7 +200,7 @@ function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Students"
-          value="1,245"
+          value={users?.length}
           subtitle="Across 24 classes"
           icon={<Users size={24} />}
           color="bg-blue-600"
@@ -154,7 +209,7 @@ function Home() {
         />
         <StatCard
           title="Total Staff"
-          value="84"
+          value={users?.filter((u) => u.type != "parent" && u.type != "student")?.length}
           subtitle="62 Teachers, 22 Admin"
           icon={<GraduationCap size={24} />}
           color="bg-purple-600"
@@ -163,8 +218,8 @@ function Home() {
         />
         <StatCard
           title="Fee Collection"
-          value="$450k"
-          subtitle="85% collected"
+          value={getTotalFee()?.totalFees}
+          subtitle={`${((getTotalFee()?.totalFees - getTotalFee()?.pendingFee) / getTotalFee()?.totalFees).toFixed(2)}% collected`}
           icon={<Banknote size={24} />}
           color="bg-emerald-600"
           trend="+8%"
@@ -172,7 +227,7 @@ function Home() {
         />
         <StatCard
           title="New Admissions"
-          value="125"
+          value={newUsers?.length || 0}
           subtitle="42 pending approval"
           icon={<UserPlus size={24} />}
           color="bg-orange-600"
@@ -280,25 +335,53 @@ function Home() {
             <button className="text-blue-600 text-sm font-medium hover:underline">View All</button>
           </div>
           <div className="space-y-3">
-            {recentActivities.map((activity) => {
-              const Icon = activity.icon;
-              return (
-                <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                  <div className={`p-2 rounded-lg ${getActivityColor(activity.color)} shrink-0`}>
-                    <Icon size={16} />
+            {users?.find((u) => u.type === "principal")?.activity?.length > 0 ? (
+              users
+                ?.find((u) => u.type === "principal")
+                ?.activity?.map((acti, ind) => (
+                  <div
+                    key={ind}
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
+                  >
+                    {/* Timeline Dot */}
+                    <div className="flex flex-col items-center">
+                      <div className="w-3 h-3 rounded-full bg-blue-500" />
+                      {ind !==
+                        users?.find((u) => u.type === "principal")?.activity?.length - 1 && (
+                          <div className="w-[1px] flex-1 bg-slate-200 mt-1" />
+                        )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-900 font-medium">
+                        {acti?.title}
+                      </p>
+
+                      {acti?.message && (
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {acti.message}
+                        </p>
+                      )}
+
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        {acti?.date
+                          ? new Date(acti.date).toLocaleString()
+                          : ""}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-slate-900 font-medium">{activity.action}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">by {activity.user} • {activity.time}</p>
-                  </div>
-                </div>
-              );
-            })}
+                ))
+            ) : (
+              <p className="text-sm text-slate-400 text-center py-6">
+                No recent activity
+              </p>
+            )}
           </div>
         </div>
 
         {/* Upcoming Events */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        {/* <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-slate-900">Upcoming Events</h3>
             <button
@@ -340,12 +423,12 @@ function Home() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Top Performers & Notice Board */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Top Performers */}
+      {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+     
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-slate-900">Top Performers</h3>
@@ -375,7 +458,7 @@ function Home() {
           </div>
         </div>
 
-        {/* Notice Board */}
+      
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-slate-900">Notice Board</h3>
@@ -406,10 +489,10 @@ function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Quick Governance */}
-      <div className="bg-slate-900 p-6 rounded-2xl shadow-lg text-white">
+      {/* <div className="bg-slate-900 p-6 rounded-2xl shadow-lg text-white">
         <h3 className="text-lg font-bold mb-4">Quick Governance</h3>
         <p className="text-slate-400 text-sm mb-6">Direct access to administrative oversight tools.</p>
 
@@ -436,7 +519,7 @@ function Home() {
             <span className="text-slate-400 text-xs">Ready</span>
           </button>
         </div>
-      </div>
+      </div> */}
       <AddEventModal
         isOpen={isModalOpen}
         onClose={() => {

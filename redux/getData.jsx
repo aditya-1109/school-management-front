@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiFunction } from "../api/apiFunction";
-import { getAlleventsApi, getAllNewUserApi, getClassesApi, getCommunicationApi, getCourseApi, getExamApi, getFeesApi, getMyselfApi, getTimeTableApi, getUserApi, getUserByIdApi } from "../api/apis";
+import { getAlleventsApi, getAllNewUserApi, getClassesApi, getCommunicationApi, getCourseApi, getExamApi, getFeesApi, getInfoApi, getMyselfApi, getTimeTableApi, getUserApi, getUserByIdApi } from "../api/apis";
 
 export const getUserByIdRedux = createAsyncThunk("getData/getUserByIdRedux", async({id})=>{
     const response = await apiFunction(getUserByIdApi, [id], {}, "get", true);
@@ -85,6 +85,15 @@ export const getEventsRedux = createAsyncThunk("getData/getEventsRedux", async (
 })
 
 
+export const getInfoRedux = createAsyncThunk("getData/getInfoRedux", async () => {
+
+    const response = await apiFunction(getInfoApi, [], {}, "get", true);
+    if (response) {
+        return response.info
+    }
+
+})
+
 
 
 const initialState = {
@@ -100,7 +109,8 @@ const initialState = {
     myself: null,
     fees: null,
     newUsers: null,
-    events: null
+    events: null,
+    info: null,
 }
 
 const getDataSlice = createSlice({
@@ -257,6 +267,36 @@ const getDataSlice = createSlice({
         .addCase(getEventsRedux.rejected, (state, action)=>{
             state.loading = false
             state.events = null
+            state.error = action.payload
+        })
+        .addCase(getInfoRedux.pending, (state, action)=>{
+            state.loading = true
+            state.info = null
+            state.error = null
+        })
+        .addCase(getInfoRedux.fulfilled, (state, action)=>{
+            state.loading = false
+            state.info = action.payload
+            state.error = null
+        })
+        .addCase(getInfoRedux.rejected, (state, action)=>{
+            state.loading = false
+            state.info = null
+            state.error = action.payload
+        })
+        .addCase(getNewUserRedux.pending, (state, action)=>{
+            state.loading = true
+            state.newUsers = null
+            state.error = null
+        })
+        .addCase(getNewUserRedux.fulfilled, (state, action)=>{
+            state.loading = false
+            state.newUsers = action.payload
+            state.error = null
+        })
+        .addCase(getNewUserRedux.rejected, (state, action)=>{
+            state.loading = false
+            state.newUsers = null
             state.error = action.payload
         })
         

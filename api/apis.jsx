@@ -91,3 +91,11 @@ export const updateeventsApi = `${baseUrl}/api/events/updateEvents`
 
 export const deleteeventsApi = `${baseUrl}/api/events/deleteEvents`
 
+export const createInfoApi = `${baseUrl}/api/info/createInfo`
+
+export const getInfoApi = `${baseUrl}/api/info/getInfo`
+
+export const updateInfoApi = `${baseUrl}/api/info/updateInfo`
+
+export const deleteInfoApi = `${baseUrl}/api/info/deleteInfo`
+

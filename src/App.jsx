@@ -14,6 +14,7 @@ import Timetable from './Pages/timeTable';
 import Attendance from './Pages/attendance';
 import EventsManagement from './Pages/events';
 import RouterProtector from './routerProtector';
+import SchoolInfo from './Pages/schoolInfo';
 
 function App() {
 return (
@@ -39,6 +40,7 @@ return (
         <Route path="FeeManagement" element={<FeeManagement />} />
         <Route path="communication/:activeTab" element={<Communication />} />
         <Route path='broadcast' element={<Braodcast />} />
+        <Route path="school" element={<SchoolInfo />} />
         <Route path="exams" element={<Exams />} />
         <Route path="attendance" element={<Attendance />} />
         <Route path="events" element={<EventsManagement />} />

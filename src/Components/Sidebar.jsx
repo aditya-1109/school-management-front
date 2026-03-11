@@ -5,7 +5,8 @@ import {
     LayoutDashboard, Users, GraduationCap, School, Banknote,
     CalendarCheck, Settings, LogOut, ChevronDown, ChevronRight,
     UserCog, Building2, UsersRound, FileText, CreditCard, Key, ClipboardList,
-    ShieldCheck, Bell, Activity, UserPlus, Shield, Mail, Calendar // Added UserPlus, Shield, Mail, Calendar
+    ShieldCheck, Bell, Activity, UserPlus, Shield, Mail, Calendar, // Added UserPlus, Shield, Mail, Calendar
+    InfoIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -62,6 +63,15 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             icon: UserPlus,
             type: 'single',
             path: '/home/AdmissionManagement'
+           
+        },
+
+        {
+            id: 'info',
+            title: 'Information',
+            icon: InfoIcon,
+            type: 'single',
+            path: '/home/school'
            
         },
         {
