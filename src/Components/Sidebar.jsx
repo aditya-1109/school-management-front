@@ -23,6 +23,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         );
     };
 
+    const logout = () => {
+        localStorage.removeItem('token');
+        window.location.href = '/';
+    };
+
     const isActive = (path) => location.pathname === path;
 
     // Helper to check if any child of a group is active
@@ -236,7 +241,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         <h4 className="text-sm font-bold text-slate-800 truncate">Admin User</h4>
                         <p className="text-xs text-slate-500 truncate">admin@school.com</p>
                     </div>
-                    <LogOut size={18} className="text-slate-400 group-hover:text-red-500 transition-colors" />
+                    <LogOut onClick={logout} size={18} className="text-slate-400 group-hover:text-red-500 transition-colors" />
                 </div>
             </div>
         </motion.div>
