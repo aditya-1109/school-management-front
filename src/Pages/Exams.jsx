@@ -68,6 +68,7 @@ const Exams = () => {
 
             response = await apiFunction(createExamApi, [], newExam, "post", true)
         } else {
+            console.log({ ...newCourse, type: courseType })
             response = await apiFunction(createCourseApi, [], { ...newCourse, type: courseType }, "post", true)
         }
         if (response.success) {
@@ -273,7 +274,7 @@ const Exams = () => {
                                         <p className="text-xs text-slate-500">Class: {exam.class}- {exam.section?.toUpperCase()} • {courseType === "exam" ? `Date: ${exam.date}` : `Due-Date: ${exam.dueDate}`}</p>
                                         <p className="text-xs text-slate-500">Subject: {exam.subject} {courseType !== "exam" && `Chapter: ${exam.chapter}`}</p>
                                         {courseType !== "exam" &&
-                                            exam.content?.map((fileUrl, index) => {
+                                            exam?.content?.map((fileUrl, index) => {
                                                 const fileName = decodeURIComponent(fileUrl.split("/").pop());
 
                                                 return (

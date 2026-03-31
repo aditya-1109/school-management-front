@@ -180,7 +180,7 @@ function Home() {
           <h1 className="text-2xl font-bold text-slate-900">School Overview</h1>
           <p className="text-slate-600 text-sm">Executive Dashboard • Last updated: {new Date().toLocaleTimeString()}</p>
         </div>
-        <div className="flex gap-3">
+        {/* <div className="flex gap-3">
           <select
             className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-50 outline-none cursor-pointer"
             value={selectedPeriod}
@@ -193,7 +193,7 @@ function Home() {
           <button onClick={handleApi} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
             Download Reports
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* KPI Grid */}

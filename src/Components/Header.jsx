@@ -1,7 +1,10 @@
 import React from 'react';
 import { Bell, Search, User, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 function Header({ toggleSidebar, isSidebarOpen }) {
+
+  const navigate = useNavigate();
   return (
     <header className="flex justify-between items-center py-4 px-6 bg-white border-b border-slate-200 shadow-sm z-40 sticky top-0">
 
@@ -22,7 +25,7 @@ function Header({ toggleSidebar, isSidebarOpen }) {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="relative p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+        <button onClick={() => navigate('/home/notification')} className="relative p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
           <Bell size={20} />
           <span className="absolute top-1 right-2 h-2 w-2 bg-red-500 rounded-full border border-white"></span>
         </button>

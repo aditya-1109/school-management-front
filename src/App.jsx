@@ -15,6 +15,7 @@ import Attendance from './Pages/attendance';
 import EventsManagement from './Pages/events';
 import RouterProtector from './routerProtector';
 import SchoolInfo from './Pages/schoolInfo';
+import Notifications from './Pages/notification';
 
 function App() {
 return (
@@ -35,6 +36,8 @@ return (
         <Route path="admissions/forms" element={<AdmissionManagement view="forms" />} />
 
         <Route path='timetable' element={<Timetable />} />
+
+        <Route path="notification" element={<Notifications />} />
 
         <Route path="SalaryManagement" element={<SalaryManagement />} />
         <Route path="FeeManagement" element={<FeeManagement />} />

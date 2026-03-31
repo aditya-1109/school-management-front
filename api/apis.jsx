@@ -99,3 +99,5 @@ export const updateInfoApi = `${baseUrl}/api/info/updateInfo`
 
 export const deleteInfoApi = `${baseUrl}/api/info/deleteInfo`
 
+export const updateNotificationApi = `${baseUrl}/api/user/updateNotification`
+
