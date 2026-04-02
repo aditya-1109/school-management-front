@@ -162,9 +162,9 @@ const AdmissionManagement = () => {
 
             showToast(response?.message, response?.success? "success" : "error");
 
-        if(response?.success) {
-                dispatch(getNewUserRedux());
-            }
+            dispatch(getNewUserRedux());
+
+     
 
         setLoading(false);
         };
