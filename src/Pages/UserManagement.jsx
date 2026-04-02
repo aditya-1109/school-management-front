@@ -124,6 +124,8 @@ const UserManagement = () => {
 
 
     const handleAdd = async () => {
+
+        console.log("Creating user with data:", newUser);
         const response = await apiFunction(createUserApi, [], newUser, "post", false);
         if (response.success) {
 
