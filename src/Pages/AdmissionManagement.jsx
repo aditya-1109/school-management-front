@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import Toast from '../Components/Toast';
-import { createNewUSerApi, updateNewUserApi } from '../../api/apis';
+import { approveNewUserApi, createNewUSerApi, updateNewUserApi } from '../../api/apis';
 import { getNewUserRedux } from '../../redux/getData';
 import { supabase } from '../../lib/supabase';
 import { apiFunction } from '../../api/apiFunction';
@@ -131,14 +131,16 @@ const AdmissionManagement = () => {
         }
     };
 
-    const handleStatusUpdate = async (app, status) => {
+    const handleStatusUpdate = async (id, status) => {
         setLoading(true);
 
+        console.log("Updating status for ID:", id, "to", status);
+
         const response = await apiFunction(
-            updateNewUserApi,
-            [app.id],
-            { ...app, status },
-            "put",
+            approveNewUserApi,
+            [],
+            {id, status },
+            "post",
             true
         );
 
@@ -320,14 +322,14 @@ const AdmissionManagement = () => {
                                                 {user.status === "Pending" && (
                                                     <>
                                                         <button
-                                                            onClick={() => handleStatusUpdate(user, "Approved")}
+                                                            onClick={() => handleStatusUpdate(user?.id, "approved")}
                                                             className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
                                                         >
                                                             Approve
                                                         </button>
 
                                                         <button
-                                                            onClick={() => handleStatusUpdate(user, "Rejected")}
+                                                            onClick={() => handleStatusUpdate(user?.id, "rejected")}
                                                             className="px-3 py-1.5 text-xs font-medium rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition"
                                                         >
                                                             Reject

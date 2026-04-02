@@ -1,7 +1,7 @@
 
-// const baseUrl = "http://localhost:3000";
+const baseUrl = "http://localhost:3000";
 
-const baseUrl = "https://school-management-backend-z8fa.onrender.com"
+// const baseUrl = "https://school-management-backend-z8fa.onrender.com"
 
 export const createUserApi= `${baseUrl}/api/user/createUser`
 
@@ -100,4 +100,6 @@ export const updateInfoApi = `${baseUrl}/api/info/updateInfo`
 export const deleteInfoApi = `${baseUrl}/api/info/deleteInfo`
 
 export const updateNotificationApi = `${baseUrl}/api/user/updateNotification`
+
+export const approveNewUserApi = `${baseUrl}/api/newUser/approveNewUser`
 
