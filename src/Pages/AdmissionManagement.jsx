@@ -117,6 +117,8 @@ const AdmissionManagement = () => {
                 );
             }
 
+            console.log(response, "response")
+
             showToast(response?.message || "Success", response?.success ? "success" : "error");
 
             if (response?.success) {
@@ -199,7 +201,7 @@ const AdmissionManagement = () => {
 
 
         const filteredUsers = newUsers?.filter(user =>
-            (filter === "All" || user.status === filter) &&
+            (filter === "All" || user.status.toLowerCase() === filter.toLowerCase()) &&
             user.name.toLowerCase().includes(search.toLowerCase())
         );
 
