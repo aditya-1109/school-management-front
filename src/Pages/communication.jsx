@@ -12,6 +12,7 @@ const Communication = () => {
     const { activeTab } = useParams()
     const [searchInboxQuery, setSearchInboxQuery] = useState(null)
     const { users, chats, myself } = useSelector((state) => state.getData);
+    const schoolId = localStorage.getItem("schoolId")
     const [toast, setToast] = useState(null)
     const [content, setContent] = useState("");
     const [selectedRole, setSelectedRole] = useState("all");
@@ -62,6 +63,7 @@ const Communication = () => {
             title: content,
             type: activeTab,
             secondPerson: secondPersonIds,
+            schoolId: schoolId
         };
 
 

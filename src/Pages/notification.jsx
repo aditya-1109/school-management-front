@@ -7,7 +7,10 @@ import { useNavigate } from "react-router-dom";
 import { getUserRedux } from "../../redux/getData";
 
 export default function Notifications() {
-  const { users, parentStudent, loading } = useSelector((state) => state.getData);
+  const { users: allUsers, parentStudent, loading } = useSelector((state) => state.getData);
+  const schoolId = localStorage.getItem("schoolId")
+
+  const users = useMemo(() => allUsers?.filter(u => String(u.schoolId) === String(schoolId)), [allUsers, schoolId]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
@@ -18,10 +21,10 @@ export default function Notifications() {
 
   // ✅ Fetch user
   useEffect(() => {
-    if (!users) {
+    if (!allUsers) {
       dispatch(getUserRedux());
     }
-  }, [users, dispatch]);
+  }, [allUsers, dispatch]);
 
   const myself = useMemo(() => {
     if (!users) return null;

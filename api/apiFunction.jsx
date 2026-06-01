@@ -16,7 +16,8 @@ export const apiFunction = async (
     if (withAuth) {
       const token = localStorage.getItem("token");
       config.headers = {
-        Authorization: `Bearer ${token}`, 
+        Authorization: `Bearer ${token}`,
+        role: "admin"
       };
     }
 
@@ -29,11 +30,11 @@ export const apiFunction = async (
         break;
 
       case "post":
-        response = await axios.post(url, {data}, config);
+        response = await axios.post(url, { data }, config);
         break;
 
       case "put":
-        response = await axios.put(url, {data}, config);
+        response = await axios.put(url, { data }, config);
         break;
 
       case "delete":
@@ -44,12 +45,12 @@ export const apiFunction = async (
         throw new Error("Invalid request type");
     }
 
-    console.log("response",response)
+    console.log("response", response)
 
     return response.data;
   } catch (error) {
     console.error("API Error:", error.response?.data || error.message);
     return error.response?.data
-   
+
   }
 };

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import AddEventModal from '../Components/AddEventModal';
 import { Users, GraduationCap, Banknote, TrendingUp, UserPlus, FileText, Megaphone, AlertCircle, Clock, CheckCircle, XCircle, Calendar, Award, BookOpen, DollarSign } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
 import axios from "axios"
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
 import { getClassesRedux, getFeesRedux, getNewUserRedux, getUserRedux } from '../../redux/getData';
 
 const revenueData = [
@@ -81,34 +81,49 @@ const StatCard = ({ title, value, icon, color, trend, footer, subtitle }) => (
 
 function Home() {
 
-  const { users, classes, fees, newUsers } = useSelector((state) => state.getData)
+  const { users: allUsers, classes: allClasses, fees: allFees, newUsers: allNewUsers } = useSelector((state) => state.getData)
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [events, setEvents] = useState(initialEvents);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
+  const schoolId = localStorage.getItem("schoolId")
+  const navigate = useNavigate()
+
+  const users = useMemo(() => allUsers?.filter(u => String(u.schoolId) === String(schoolId)), [allUsers, schoolId]);
+  const classes = useMemo(() => allClasses?.filter(c => String(c.schoolId) === String(schoolId)), [allClasses, schoolId]);
+  const fees = useMemo(() => allFees?.filter(f => String(f.schoolId) === String(schoolId)), [allFees, schoolId]);
+  const newUsers = useMemo(() => allNewUsers?.filter(n => String(n.schoolId) === String(schoolId)), [allNewUsers, schoolId]);
+
+  useEffect(() => {
+    if (!schoolId) {
+      navigate("/login")
+    }
+  }, [])
+
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!users) {
+    if (!allUsers) {
       dispatch(getUserRedux())
     }
-    if (!classes) {
+    if (!allClasses) {
       dispatch(getClassesRedux())
     }
-    if (!fees) {
+    if (!allFees) {
       dispatch(getFeesRedux())
     }
-    if (!newUsers) {
+    if (!allNewUsers) {
       dispatch(getNewUserRedux())
     }
-  }, [dispatch])
+  }, [dispatch, allUsers, allClasses, allFees, allNewUsers])
 
   const getTotalFee = () => {
     if (!users || !fees) return { totalFees: 0, pendingFee: 0 };
 
     // ✅ Get only students
     const students = users?.filter((u) => u.type === "student");
+
 
     let totalFees = 0;
     let pendingFee = 0;
@@ -133,6 +148,8 @@ function Home() {
 
     return { totalFees, pendingFee };
   };
+
+
 
 
   const handleSaveEvent = (eventData) => {
@@ -165,12 +182,12 @@ function Home() {
     return colors[color] || colors.slate;
   };
 
-  const handleApi = async () => {
-    const response = await axios.post("http://localhost:3000/createNewUser");
-    console.log(response)
-  }
+  // const handleApi = async () => {
+  //   const response = await axios.post("http://localhost:3000/createNewUser");
+  //   console.log(response)
+  // }
 
-  console.log(newUsers)
+  // console.log(newUsers)
 
   return (
     <div className="space-y-8">

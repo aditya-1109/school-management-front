@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { createeventsApi, deleteeventsApi, updateeventsApi } from "../../api/apis";
 import { useDispatch, useSelector } from "react-redux";
 import { getEventsRedux } from "../../redux/getData";
@@ -9,6 +9,8 @@ const EventsManagement = () => {
   const [openModal, setOpenModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const { events } = useSelector((state) => state.getData)
+  const schoolId = localStorage.getItem("schoolId")
+
   const [toast, setToast] = useState()
 
   const dispatch = useDispatch()
@@ -20,6 +22,7 @@ const EventsManagement = () => {
     attendees: 0,
     status: "pending",
     approval: "not",
+    schoolId: schoolId
   });
 
   const showToast = (message, type = 'success') => {
@@ -33,7 +36,7 @@ const EventsManagement = () => {
 
       dispatch(getEventsRedux())
     }
-  }, []);
+  }, [events, dispatch]);
 
 
   const handleSubmit = async () => {
@@ -105,6 +108,7 @@ const EventsManagement = () => {
       attendees: 0,
       status: "pending",
       approval: "not",
+      schoolId: schoolId
     });
   };
 

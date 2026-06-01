@@ -16,38 +16,42 @@ import EventsManagement from './Pages/events';
 import RouterProtector from './routerProtector';
 import SchoolInfo from './Pages/schoolInfo';
 import Notifications from './Pages/notification';
+import LibraryManagement from './Pages/libraryManagement';
+import BusManagement from './Pages/BusManagement';
 
 function App() {
-return (
-  <Router>
-    <Routes>
+  return (
+    <Router>
+      <Routes>
 
-      <Route path="/" element={<Login />} />
+        <Route path="/" element={<Login />} />
 
-      <Route path="/home" element={<RouterProtector><Layout /></RouterProtector>}>
+        <Route path="/home" element={<RouterProtector><Layout /></RouterProtector>}>
 
-        <Route index element={<Home />} />
-        <Route path="classmateManagement" element={<ClassManagement />} />
+          <Route index element={<Home />} />
+          <Route path="classmateManagement" element={<ClassManagement />} />
 
-        <Route path='userManagement/:type' element={<UserManagement />} />
-        {/* Admission Management Routes */}
-        <Route path="AdmissionManagement" element={<AdmissionManagement view="dashboard" />} />
-        <Route path="admissions/applications" element={<AdmissionManagement view="applications" />} />
-        <Route path="admissions/forms" element={<AdmissionManagement view="forms" />} />
+          <Route path='userManagement/:type' element={<UserManagement />} />
+          {/* Admission Management Routes */}
+          <Route path="AdmissionManagement" element={<AdmissionManagement view="dashboard" />} />
+          <Route path="admissions/applications" element={<AdmissionManagement view="applications" />} />
+          <Route path="admissions/forms" element={<AdmissionManagement view="forms" />} />
 
-        <Route path='timetable' element={<Timetable />} />
+          <Route path='timetable' element={<Timetable />} />
 
-        <Route path="notification" element={<Notifications />} />
+          <Route path="notification" element={<Notifications />} />
 
-        <Route path="SalaryManagement" element={<SalaryManagement />} />
-        <Route path="FeeManagement" element={<FeeManagement />} />
-        <Route path="communication/:activeTab" element={<Communication />} />
-        <Route path='broadcast' element={<Braodcast />} />
-        <Route path="school" element={<SchoolInfo />} />
-        <Route path="exams" element={<Exams />} />
-        <Route path="attendance" element={<Attendance />} />
-        <Route path="events" element={<EventsManagement />} />
-        <Route path="*" element={<h1>404 Not Found</h1>} />
+          <Route path="SalaryManagement" element={<SalaryManagement />} />
+          <Route path="FeeManagement" element={<FeeManagement />} />
+          <Route path="communication/:activeTab" element={<Communication />} />
+          <Route path='broadcast' element={<Braodcast />} />
+          <Route path="school" element={<SchoolInfo />} />
+          <Route path="exams" element={<Exams />} />
+          <Route path="attendance" element={<Attendance />} />
+          <Route path="events" element={<EventsManagement />} />
+          <Route path="libraryManagement" element={<LibraryManagement />} />
+          <Route path="busManagement" element={<BusManagement />} />
+          <Route path="*" element={<h1>404 Not Found</h1>} />
 
       </Route>
 

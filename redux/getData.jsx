@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiFunction } from "../api/apiFunction";
-import { getAlleventsApi, getAllNewUserApi, getClassesApi, getCommunicationApi, getCourseApi, getExamApi, getFeesApi, getInfoApi, getMyselfApi, getTimeTableApi, getUserApi, getUserByIdApi } from "../api/apis";
+import { getAllBooksApi, getAlleventsApi, getAllNewUserApi, getBusBySchoolIdApi, getClassesApi, getCommunicationApi, getCourseApi, getExamApi, getFeesApi, getInfoApi, getMyselfApi, getTimeTableApi, getUserApi, getUserByIdApi } from "../api/apis";
 
 export const getUserByIdRedux = createAsyncThunk("getData/getUserByIdRedux", async({id})=>{
     const response = await apiFunction(getUserByIdApi, [id], {}, "get", true);
@@ -12,35 +12,40 @@ export const getUserByIdRedux = createAsyncThunk("getData/getUserByIdRedux", asy
 export const getUserRedux = createAsyncThunk("getData/getUserRedux", async()=>{
     const response = await apiFunction(getUserApi, [], {}, "get", true);
     if(response){
-        return response.users
+        const users = response.users.filter((user) => String(user.schoolId) === String(localStorage.getItem("schoolId")))
+        return users
     }
 })
 
 export const getClassesRedux = createAsyncThunk("getData/getClassesRedux", async()=>{
     const response = await apiFunction(getClassesApi, [], {}, "get", true);
      if(response){
-        return response.classes
+        const classes = response.classes.filter((classe) => String(classe.schoolId) === String(localStorage.getItem("schoolId")))
+        return classes
     }
 })
 
 export const getTimeTableRedux = createAsyncThunk("getData/getTimeTableRedux", async()=>{
     const response = await apiFunction(getTimeTableApi, [], {}, "get", true)
     if(response){
-        return response.timeTables
+        const timeTables = response.timeTables.filter((timeTable) => String(timeTable.schoolId) === String(localStorage.getItem("schoolId")))
+        return timeTables
     }
 })
 
 export const getExamsRedux = createAsyncThunk("getData/getExamsRedux", async()=>{
     const response = await apiFunction(getExamApi, [], {}, "get", true)
     if(response){
-        return response.exams
+        const exams = response.exams.filter((exam) => String(exam.schoolId) === String(localStorage.getItem("schoolId")))
+        return exams
     }
 })
 
 export const getCoursesRedux = createAsyncThunk("getData/getCoursesRedux", async()=>{
     const response = await apiFunction(getCourseApi, [], {}, "get", true)
     if(response){
-        return response.courses
+        const courses = response.courses.filter((course) => String(course.schoolId) === String(localStorage.getItem("schoolId")))
+        return courses
     }
 })
 
@@ -48,7 +53,8 @@ export const getCommunicationRedux = createAsyncThunk("getData/getCommunicationR
     console.log(type)
     const response = await apiFunction(getCommunicationApi, [type], {}, "get", true)
     if(response){
-        return response.chats
+        const chats = response.chats.filter((chat) => String(chat.schoolId) === String(localStorage.getItem("schoolId")))
+        return chats
     }
 })
 
@@ -62,16 +68,16 @@ export const getMyselfRedux = createAsyncThunk("getData/getMyselfRedux", async()
 export const getFeesRedux = createAsyncThunk("getData/getFeesRedux", async()=>{
     const response = await apiFunction(getFeesApi, [], {}, "get", true)
     if(response){
-        console.log(response)
-        return response.fees
+        const fees = response.fees.filter((fee) => String(fee.schoolId) === String(localStorage.getItem("schoolId")))
+        return fees
     }
 })
 
 export const getNewUserRedux = createAsyncThunk("getData/getNewUserRedux", async()=>{
     const response = await apiFunction(getAllNewUserApi, [], {}, "get", true)
     if(response){
-        console.log(response)
-        return response.data
+        const newUsers = response.data.filter((newUser) => String(newUser.schoolId) === String(localStorage.getItem("schoolId")))
+        return newUsers
     }
 })
 
@@ -79,7 +85,8 @@ export const getEventsRedux = createAsyncThunk("getData/getEventsRedux", async (
 
     const response = await apiFunction(getAlleventsApi, [], {}, "get", true);
     if (response) {
-        return response.data
+        const events = response.data.filter((event) => String(event.schoolId) === String(localStorage.getItem("schoolId")))
+        return events
     }
 
 })
@@ -89,9 +96,26 @@ export const getInfoRedux = createAsyncThunk("getData/getInfoRedux", async () =>
 
     const response = await apiFunction(getInfoApi, [], {}, "get", true);
     if (response) {
-        return response.info
+        const info = response.info.filter((info) => String(info.schoolId) === String(localStorage.getItem("schoolId")))
+        return info
     }
 
+})
+
+export const getAllBooksRedux = createAsyncThunk("getData/getAllBooksRedux", async () => {
+    const response = await apiFunction(getAllBooksApi, [], {}, "get", true)
+    if (response) {
+        console.log(response)
+        return response.books
+    }
+})
+
+export const getBusRedux = createAsyncThunk("getData/getBusRedux", async()=>{
+    const response = await apiFunction(getBusBySchoolIdApi, [localStorage.getItem("schoolId")], {}, "get", true)
+    if(response){
+        console.log(response)
+        return response.bus
+    }
 })
 
 
@@ -111,6 +135,8 @@ const initialState = {
     newUsers: null,
     events: null,
     info: null,
+    books: null,
+    buses: null,
 }
 
 const getDataSlice = createSlice({
@@ -299,7 +325,36 @@ const getDataSlice = createSlice({
             state.newUsers = null
             state.error = action.payload
         })
-        
+        .addCase(getAllBooksRedux.pending, (state, action)=>{
+            state.loading = true
+            state.books = null
+            state.error = null
+        })
+        .addCase(getAllBooksRedux.fulfilled, (state, action)=>{
+            state.loading = false
+            state.books = action.payload
+            state.error = null
+        })
+        .addCase(getAllBooksRedux.rejected, (state, action)=>{
+            state.loading = false
+            state.books = null
+            state.error = action.payload
+        })
+        .addCase(getBusRedux.pending, (state, action)=>{
+            state.loading = true
+            state.buses = null
+            state.error = null
+        })
+        .addCase(getBusRedux.fulfilled, (state, action)=>{
+            state.loading = false
+            state.buses = action.payload
+            state.error = null
+        })
+        .addCase(getBusRedux.rejected, (state, action)=>{
+            state.loading = false
+            state.buses = null
+            state.error = action.payload
+        })
     }
 })
 

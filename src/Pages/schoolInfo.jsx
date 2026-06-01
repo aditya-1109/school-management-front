@@ -10,6 +10,7 @@ import { useMemo } from "react";
 const SchoolInfo = () => {
 
     const { info, users, classes } = useSelector((state) => state.getData);
+    const schoolId = localStorage.getItem("schoolId")
     const dispatch = useDispatch();
 
     const [toast, setToast] = useState(null);
@@ -24,7 +25,7 @@ const SchoolInfo = () => {
         if (!users) dispatch(getUserRedux())
         if (!info) dispatch(getInfoRedux())
         if (!classes) dispatch(getClassesRedux())
-    }, [dispatch])
+    }, [dispatch, users, info, classes])
 
 
 
@@ -38,7 +39,7 @@ const SchoolInfo = () => {
         if (id) {
             response = await apiFunction(updateInfoApi, [], submitData, "put", true)
         } else {
-            response = await apiFunction(createInfoApi, [], data, "post", true)
+            response = await apiFunction(createInfoApi, [], { ...data, schoolId }, "post", true)
         }
         if (response) {
             showToast(response.message, response.success ? "success" : "error")

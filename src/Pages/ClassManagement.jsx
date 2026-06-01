@@ -25,7 +25,9 @@ const ClassManagement = () => {
 
   const { users, classes } = useSelector((state) => state.getData)
 
-  const [newClass, setNewClass] = useState({ className: 'Class 10', section: '', teacher: "", subject: "" });
+  const schoolId = localStorage.getItem("schoolId")
+
+  const [newClass, setNewClass] = useState({ className: 'Class 10', section: '', teacher: "", subject: "", schoolId: schoolId });
 
   const students = useMemo(() => {
     return users?.filter((user) => user.type === "student")
@@ -57,7 +59,7 @@ const ClassManagement = () => {
         dispatch(getClassesRedux())
       }
     }
-  }, [dispatch]);
+  }, [dispatch, users, classes]);
 
 
 
@@ -76,7 +78,7 @@ const ClassManagement = () => {
     if (response.success) {
       showToast(response.message, "success")
       dispatch(getClassesRedux())
-      setNewClass({ className: 'Class 10', section: '', teacher: "", subject: "" })
+      setNewClass({ className: 'Class 10', section: '', teacher: "", subject: "", schoolId: schoolId })
       setIsModalOpen(false)
     } else {
       showToast(response.message, "error")
@@ -143,7 +145,7 @@ const ClassManagement = () => {
       dispatch(getClassesRedux())
       setIsModalOpen(false)
       setSelectedClass(null)
-      setNewClass({ className: 'Class 10', section: '', teacher: "", subject: "" })
+      setNewClass({ className: 'Class 10', section: '', teacher: "", subject: "", schoolId: schoolId })
     } else {
       showToast(response.message, "error")
     }
@@ -381,7 +383,7 @@ const ClassManagement = () => {
               <button
                 onClick={() => {
                   setIsModalOpen(false)
-                  setNewClass({ className: 'Class 10', section: '', teacher: "", subject: "" })
+                  setNewClass({ className: 'Class 10', section: '', teacher: "", subject: "", schoolId: schoolId })
                 }}
                 className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg font-medium"
               >

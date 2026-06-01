@@ -2,13 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Search, Calendar } from "lucide-react";
 import { apiFunction } from "../../api/apiFunction";
-import { updateAttendanceApi } from "../../api/apis";
+import { updateAttendanceApi, approveLeaveApi } from "../../api/apis";
 import { getUserRedux } from "../../redux/getData";
 import Toast from "../Components/Toast";
 
 export default function Attendance() {
     const { users } = useSelector((state) => state.getData);
-
+    const schoolId = localStorage.getItem("schoolId")
     const [activeTab, setActiveTab] = useState("student");
     const [search, setSearch] = useState("");
     const [dateFilter, setDateFilter] = useState("today");
@@ -18,7 +18,7 @@ export default function Attendance() {
     const [toast, setToast] = useState(null)
     const dispatch = useDispatch()
 
-    const tabs = ["student", "teacher", "principal"];
+    const tabs = ["student", "teacher", "principal", "leaves"];
 
     const showToast = (message, type = 'success') => {
         setToast({ message, type });
@@ -31,7 +31,11 @@ export default function Attendance() {
         if (!users) {
             dispatch(getUserRedux())
         }
-    }, [dispatch])
+    }, [dispatch, users])
+
+
+
+
 
 
     const filteredUsers = useMemo(() => {
@@ -97,6 +101,35 @@ export default function Attendance() {
     }, [users, activeTab, search, dateFilter, statusFilter]);
 
 
+
+    const allLeaves = useMemo(() => {
+        if (!users) return [];
+        const result = [];
+        users.forEach((user) => {
+            if (user.leave && user.leave.length > 0) {
+                user.leave.forEach((l) => {
+                    result.push({
+                        ...l,
+                        userId: user.id,
+                        userName: user.name,
+                        userEmail: user.email,
+                        userType: user.type
+                    });
+                });
+            }
+        });
+        return result.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }, [users]);
+
+    const handleApproveLeave = async (leave, newStatus) => {
+        const response = await apiFunction(approveLeaveApi, [leave.userId], { date: leave.date, reason: leave.reason, status: newStatus }, "put", true);
+        if (response.success) {
+            showToast(`Leave ${newStatus} successfully`, "success");
+            dispatch(getUserRedux());
+        } else {
+            showToast(response.message || "Failed to update leave", "error");
+        }
+    }
 
     const markAttendance = async (id) => {
         const response = await apiFunction(updateAttendanceApi, [id], newAttendance, "put", true)
@@ -176,14 +209,14 @@ export default function Attendance() {
                                 key={status}
                                 onClick={() => setStatusFilter(status)}
                                 className={`px-4 py-2 text-sm font-medium capitalize transition ${statusFilter === status
-                                        ? status === "present"
-                                            ? "bg-green-600 text-white"
-                                            : status === "late"
-                                                ? "bg-yellow-500 text-white"
-                                                : status === "absent"
-                                                    ? "bg-red-600 text-white"
-                                                    : "bg-blue-600 text-white"
-                                        : "text-slate-600 hover:bg-slate-100"
+                                    ? status === "present"
+                                        ? "bg-green-600 text-white"
+                                        : status === "late"
+                                            ? "bg-yellow-500 text-white"
+                                            : status === "absent"
+                                                ? "bg-red-600 text-white"
+                                                : "bg-blue-600 text-white"
+                                    : "text-slate-600 hover:bg-slate-100"
                                     }`}
                             >
                                 {status}
@@ -212,92 +245,172 @@ export default function Attendance() {
 
             {/* TABLE */}
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-slate-100 text-slate-600 text-sm uppercase">
-                            <tr>
-                                <th className="px-6 py-4">Name</th>
-                                <th className="px-6 py-4">Email</th>
-                                <th className="px-6 py-4">Attendance %</th>
-                                <th className="px-6 py-4">Today Status</th>
-                            </tr>
-                        </thead>
+                {activeTab !== "leaves" ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-100 text-slate-600 text-sm uppercase">
+                                <tr>
+                                    <th className="px-6 py-4">Name</th>
+                                    <th className="px-6 py-4">Email</th>
+                                    <th className="px-6 py-4">Attendance %</th>
+                                    <th className="px-6 py-4">Today Status</th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            {filteredUsers?.length > 0 ? (
-                                filteredUsers.map((user) => (
-                                    <tr
-                                        key={user.id}
-                                        onClick={() => setAttendanceModal(user)}
-                                        className="border-t border-slate-100 hover:bg-slate-50 transition"
-                                    >
-                                        {/* Name */}
-                                        <td className="px-6 py-4 flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
-                                                {user.name?.charAt(0)}
-                                            </div>
-                                            <span className="font-medium text-slate-800">
-                                                {user.name}
-                                            </span>
-                                        </td>
-
-                                        {/* Email */}
-                                        <td className="px-6 py-4 text-slate-600 text-sm">
-                                            {user.email}
-                                        </td>
-
-                                        {/* Attendance Percentage */}
-                                        <td className="px-6 py-4 w-60">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-full bg-slate-200 rounded-full h-2.5">
-                                                    <div
-                                                        className={`h-2.5 rounded-full ${user.attendancePercentage >= 75
-                                                            ? "bg-green-500"
-                                                            : user.attendancePercentage >= 50
-                                                                ? "bg-yellow-500"
-                                                                : "bg-red-500"
-                                                            }`}
-                                                        style={{
-                                                            width: `${user.attendancePercentage}%`,
-                                                        }}
-                                                    />
+                            <tbody>
+                                {filteredUsers?.length > 0 ? (
+                                    filteredUsers.map((user) => (
+                                        <tr
+                                            key={user.id}
+                                            onClick={() => setAttendanceModal(user)}
+                                            className="border-t border-slate-100 hover:bg-slate-50 transition cursor-pointer"
+                                        >
+                                            {/* Name */}
+                                            <td className="px-6 py-4 flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
+                                                    {user.name?.charAt(0)}
                                                 </div>
-                                                <span className="text-sm font-medium text-slate-700">
-                                                    {user.attendancePercentage}%
+                                                <span className="font-medium text-slate-800">
+                                                    {user.name}
                                                 </span>
-                                            </div>
-                                        </td>
+                                            </td>
 
-                                        {/* Today Status */}
-                                        <td className="px-6 py-4">
-                                            <span
-                                                className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${user.todayStatus === "present"
-                                                    ? "bg-green-100 text-green-600"
-                                                    : user.todayStatus === "late"
-                                                        ? "bg-yellow-100 text-yellow-600"
-                                                        : user.todayStatus === "absent"
-                                                            ? "bg-red-100 text-red-600"
-                                                            : "bg-gray-100 text-gray-500"
-                                                    }`}
-                                            >
-                                                {user.todayStatus || "Not Marked"}
-                                            </span>
+                                            {/* Email */}
+                                            <td className="px-6 py-4 text-slate-600 text-sm">
+                                                {user.email}
+                                            </td>
+
+                                            {/* Attendance Percentage */}
+                                            <td className="px-6 py-4 w-60">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-full bg-slate-200 rounded-full h-2.5">
+                                                        <div
+                                                            className={`h-2.5 rounded-full ${user.attendancePercentage >= 75
+                                                                ? "bg-green-500"
+                                                                : user.attendancePercentage >= 50
+                                                                    ? "bg-yellow-500"
+                                                                    : "bg-red-500"
+                                                                }`}
+                                                            style={{
+                                                                width: `${user.attendancePercentage}%`,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-sm font-medium text-slate-700">
+                                                        {user.attendancePercentage}%
+                                                    </span>
+                                                </div>
+                                            </td>
+
+                                            {/* Today Status */}
+                                            <td className="px-6 py-4">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${user.todayStatus === "present"
+                                                        ? "bg-green-100 text-green-600"
+                                                        : user.todayStatus === "late"
+                                                            ? "bg-yellow-100 text-yellow-600"
+                                                            : user.todayStatus === "absent"
+                                                                ? "bg-red-100 text-red-600"
+                                                                : "bg-gray-100 text-gray-500"
+                                                        }`}
+                                                >
+                                                    {user.todayStatus || "Not Marked"}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td
+                                            colSpan="4"
+                                            className="text-center py-10 text-slate-400"
+                                        >
+                                            No records found.
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-100 text-slate-600 text-sm uppercase">
                                 <tr>
-                                    <td
-                                        colSpan="4"
-                                        className="text-center py-10 text-slate-400"
-                                    >
-                                        No records found.
-                                    </td>
+                                    <th className="px-6 py-4">User</th>
+                                    <th className="px-6 py-4">Role</th>
+                                    <th className="px-6 py-4">Date</th>
+                                    <th className="px-6 py-4">Reason</th>
+                                    <th className="px-6 py-4 text-center">Status</th>
+                                    <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {allLeaves?.length > 0 ? (
+                                    allLeaves.map((leave, index) => (
+                                        <tr
+                                            key={index}
+                                            className="border-t border-slate-100 hover:bg-slate-50 transition"
+                                        >
+                                            <td className="px-6 py-4 flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
+                                                    {leave.userName?.charAt(0) || "?"}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-slate-800">{leave.userName}</div>
+                                                    <div className="text-xs text-slate-500">{leave.userEmail}</div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 capitalize text-sm text-slate-600">
+                                                {leave.userType}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-medium text-slate-700">
+                                                {new Date(leave.date).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-slate-600 max-w-xs truncate" title={leave.reason}>
+                                                {leave.reason || "No reason provided"}
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${leave.status === 'approved' ? 'bg-green-100 text-green-700' :
+                                                    leave.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                    }`}>
+                                                    {leave.status || 'pending'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                {leave.status === "pending" ? (
+                                                    <div className="flex justify-end gap-2">
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleApproveLeave(leave, "rejected"); }}
+                                                            className="px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleApproveLeave(leave, "approved"); }}
+                                                            className="px-3 py-1.5 bg-green-500 text-white hover:bg-green-600 rounded-lg text-sm font-medium shadow-sm shadow-green-200 transition"
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-sm text-slate-400 italic">Processed</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="6" className="text-center py-10 text-slate-400">
+                                            No leaves found.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
 
             {openAttendanceModal && (

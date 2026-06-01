@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import Toast from '../Components/Toast';
 import { approveNewUserApi, createNewUSerApi, updateNewUserApi } from '../../api/apis';
@@ -9,6 +9,7 @@ import { apiFunction } from '../../api/apiFunction';
 const AdmissionManagement = () => {
     const dispatch = useDispatch();
     const { newUsers } = useSelector(state => state.getData);
+    const schoolId = localStorage.getItem("schoolId");
 
     const [toast, setToast] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -26,7 +27,8 @@ const AdmissionManagement = () => {
         status: "Pending",
         dob: "",
         gender: "",
-        documents: []
+        documents: [],
+        schoolId: schoolId,
     });
 
     const [selectedFiles, setSelectedFiles] = useState({
@@ -94,6 +96,7 @@ const AdmissionManagement = () => {
 
             const payload = {
                 ...formData,
+                schoolId: schoolId,
                 documents: documentsArray
             };
 
@@ -138,11 +141,25 @@ const AdmissionManagement = () => {
 
         console.log("Updating status for ID:", user?.id, "to", status);
 
+        const docsObj = { aadhar: "", pan: "", tc: "", idCard: "" };
+        if (Array.isArray(user.documents)) {
+            user.documents.forEach((doc) => {
+                if (doc && doc.type && doc.url) {
+                    if (doc.type === "birthCertificate") {
+                        docsObj.birthCertificate = doc.url;
+                    } else {
+                        docsObj[doc.type] = doc.url;
+                    }
+                }
+            });
+        }
+
         const payload = {
             name: user.name,
             email: user.email,
             type: "student",
-            documents: { pan: "", aadhar: "" },
+            schoolId: schoolId,
+            documents: docsObj,
             phone: String(user.phone),
             address: "",
             links: {
@@ -151,7 +168,7 @@ const AdmissionManagement = () => {
                 linkdIn: "",
                 twitter: "",
             }
-        }
+        };
 
 
             const response = await apiFunction(
@@ -188,7 +205,8 @@ const AdmissionManagement = () => {
                 status: "Pending",
                 dob: "",
                 gender: "",
-                documents: []
+                documents: [],
+                schoolId: schoolId,
             });
             setSelectedFiles([]);
             setOpenModal(false);

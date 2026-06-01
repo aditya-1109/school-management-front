@@ -12,11 +12,13 @@ const coursesTypes = ["exam", "Material", "Assignment"]
 
 const Exams = () => {
     const { classes, exams, users, courses } = useSelector((state) => state.getData)
+    const schoolId = localStorage.getItem("schoolId")
+
     const [courseType, setCourseType] = useState("exam")
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingExam, setEditingExam] = useState(null);
-    const [newExam, setNewExam] = useState({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "" });
-    const [newCourse, setNewCourse] = useState({ title: '', dueDate: '', class: '', type: "", chapter: "", status: "Pending", content: "", points: "", section: "", subject: "" });
+    const [newExam, setNewExam] = useState({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "", schoolId: schoolId });
+    const [newCourse, setNewCourse] = useState({ title: '', dueDate: '', class: '', type: "", chapter: "", status: "Pending", content: "", points: "", section: "", subject: "", schoolId: schoolId });
     const [toast, setToast] = useState(null);
     const [fileUpload, setFileUpload] = useState(null)
     const [selectedClass, setSelectedClass] = useState(null)
@@ -38,7 +40,7 @@ const Exams = () => {
         if (!courses) {
             dispatch(getCoursesRedux())
         }
-    }, [dispatch])
+    }, [dispatch, classes, exams, users, courses])
 
     const materials = useMemo(() => {
         if (courseType === "exam" && exams) {
@@ -73,8 +75,8 @@ const Exams = () => {
         }
         if (response.success) {
 
-            setNewExam({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "" });
-            setNewCourse({ title: '', dueDate: '', class: '', type: "", chapter: "", status: "Pending", content: "", points: "", section: "", subject: "" })
+            setNewExam({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "", schoolId: schoolId });
+            setNewCourse({ title: '', dueDate: '', class: '', type: "", chapter: "", status: "Pending", content: "", points: "", section: "", subject: "", schoolId: schoolId })
             setIsModalOpen(false);
             dispatch(getExamsRedux())
             dispatch(getCoursesRedux())
@@ -106,8 +108,8 @@ const Exams = () => {
         }
         if (response.success) {
 
-            setNewExam({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "" });
-            setNewCourse({ title: '', dueDate: '', class: '', type: "", chapter: "", status: "Pending", content: "", points: "", section: "", subject: "" })
+            setNewExam({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "", schoolId: schoolId });
+            setNewCourse({ title: '', dueDate: '', class: '', type: "", chapter: "", status: "Pending", content: "", points: "", section: "", subject: "", schoolId: schoolId })
             setIsModalOpen(false);
             dispatch(getExamsRedux())
             dispatch(getCoursesRedux())
@@ -120,7 +122,7 @@ const Exams = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setEditingExam(null);
-        setNewExam({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "" });
+        setNewExam({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "", schoolId: schoolId });
     };
 
     const handleUpdateExam = async () => {
@@ -134,8 +136,8 @@ const Exams = () => {
             response = await apiFunction(updateCourseApi, [id], examData, "put", true);
         }
         if (response.success) {
-            setNewCourse({ title: '', dueDate: '', class: '', type: "", chapter: "", status: "Pending", content: "", points: "", section: "", subject: "" })
-            setNewExam({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "" });
+            setNewCourse({ title: '', dueDate: '', class: '', type: "", chapter: "", status: "Pending", content: "", points: "", section: "", subject: "", schoolId: schoolId })
+            setNewExam({ title: '', date: '', class: '', time: "", duration: "", marks: "", section: "", subject: "", schoolId: schoolId });
             setIsModalOpen(false);
             dispatch(getExamsRedux())
             dispatch(getCoursesRedux())

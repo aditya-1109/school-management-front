@@ -1,7 +1,7 @@
 
-// const baseUrl = "http://localhost:3000";
+const baseUrl = "http://localhost:3000";
 
-const baseUrl = "https://school-management-backend-z8fa.onrender.com"
+// const baseUrl = "https://school-management-backend-z8fa.onrender.com"
 
 export const createUserApi= `${baseUrl}/api/user/createUser`
 
@@ -103,3 +103,26 @@ export const updateNotificationApi = `${baseUrl}/api/user/updateNotification`
 
 export const approveNewUserApi = `${baseUrl}/api/newUser/approveNewUser`
 
+export const createBooksApi = `${baseUrl}/api/books/create`
+
+export const getAllBooksApi = `${baseUrl}/api/books/get/all`
+
+export const getSingleBooksApi = `${baseUrl}/api/books/get`
+
+export const updateBooksApi = `${baseUrl}/api/books/update`
+
+export const deleteBooksApi = `${baseUrl}/api/books/delete`
+
+export const approveBooksApi = `${baseUrl}/api/books/approve`
+
+export const approveLeaveApi = `${baseUrl}/api/user/approveLeave`
+
+export const createBusApi = `${baseUrl}/api/bus/createBus`
+
+export const getBusBySchoolIdApi = `${baseUrl}/api/bus/getBusBySchoolId`
+
+export const getBusByIdApi = `${baseUrl}/api/bus/getBusById`
+
+export const updateBusApi = `${baseUrl}/api/bus/updateBus`
+
+export const deleteBusApi = `${baseUrl}/api/bus/deleteBus`

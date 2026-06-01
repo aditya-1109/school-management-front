@@ -12,10 +12,11 @@ const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
 const Timetable = () => {
 
     const { users, classes, timeTables } = useSelector((state) => state.getData)
+    const schoolId = localStorage.getItem("schoolId")
     const dispatch = useDispatch()
     const [openTimeTableModel, setOpenTimeTableModel] = useState(null)
     const [selectedClass, setSelectedClass] = useState(classes && classes[0]);
-    const [newTimeTable, setNewTimeTable] = useState({ day: "", classId: "", timeTables: [] })
+    const [newTimeTable, setNewTimeTable] = useState({ day: "", classId: "", timeTables: [], schoolId: schoolId })
     const [timeSubject, setTimeSubject] = useState({ subject: "", initialTime: "", finalTime: "", teacher: "" })
     const [toast, setToast] = useState(null)
     const [selectedDay, setSelectedDay] = useState(0)
@@ -35,7 +36,7 @@ const Timetable = () => {
             }
 
         }
-    }, [dispatch])
+    }, [dispatch, users, classes, timeTables])
 
 
 
@@ -57,8 +58,9 @@ const Timetable = () => {
         if (response.success) {
 
             setOpenTimeTableModel(false)
-            setNewTimeTable({ day: "", classId: "", timeTables: [] })
+            setNewTimeTable({ day: "", classId: "", timeTables: [], schoolId: schoolId })
             setTimeSubject({ subject: "", initialTime: "", finalTime: "", teacher: "" })
+            dispatch(getTimeTableRedux())
             showToast(response.message, "success")
         } else {
             showToast(response.message, "error")
@@ -77,8 +79,6 @@ const Timetable = () => {
         }
     }
 
-    console.log(selectedTimeTable?.id)
-
     return (
         <div className="space-y-6">
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -92,7 +92,7 @@ const Timetable = () => {
                 </div>
 
                 <button onClick={() => {
-                    setNewTimeTable({ day: "", classId: selectedClass?.id, timeTables: [] })
+                    setNewTimeTable({ day: "", classId: selectedClass?.id, timeTables: [], schoolId: schoolId })
                     setOpenTimeTableModel(true)
                 }} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-sm transition">
                     + Create Timetable
@@ -176,7 +176,7 @@ const Timetable = () => {
                         ))}
 
 
-                        
+
                     </tbody>
                 </table>
             </div>
@@ -353,7 +353,7 @@ const Timetable = () => {
                         <div className="flex justify-end gap-4">
                             <button
                                 onClick={() => {
-                                    setNewTimeTable({ day: "", classId: "", timeTables: [] });
+                                    setNewTimeTable({ day: "", classId: "", timeTables: [], schoolId: schoolId });
                                     setTimeSubject({
                                         subject: "",
                                         teacher: "",

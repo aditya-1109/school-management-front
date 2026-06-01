@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getClassesRedux, getFeesRedux, getUserRedux } from "../../redux/getData";
 import { apiFunction } from "../../api/apiFunction";
 import { createFeesApi, deleteFeesApi, submitFeesApi, updateFeesApi } from "../../api/apis";
@@ -9,6 +9,7 @@ import Toast from "../Components/Toast";
 const FeeManagement = () => {
 
   const { classes, users, fees } = useSelector((state) => state.getData);
+  const schoolId = localStorage.getItem("schoolId")
 
   const dispatch = useDispatch();
 
@@ -30,7 +31,8 @@ const FeeManagement = () => {
     title: "",
     method: "",
     paidAmount: 0,
-    status: "pending"
+    status: "pending",
+    schoolId: schoolId
   });
 
   useEffect(() => {
@@ -40,7 +42,6 @@ const FeeManagement = () => {
 
   }, [dispatch]);
 
-  console.log(classes)
 
   useEffect(() => {
     if (classes && !selectedClass) {
@@ -60,7 +61,8 @@ const FeeManagement = () => {
       title: "",
       method: "",
       paidAmount: 0,
-      status: "pending"
+      status: "pending",
+      schoolId: schoolId
     });
   };
 

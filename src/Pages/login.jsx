@@ -3,25 +3,33 @@ import { apiFunction } from "../../api/apiFunction";
 import { loginUserApi } from "../../api/apis";
 import { useNavigate } from "react-router";
 import Toast from "../Components/Toast";
+import { useEffect } from "react";
 
 export default function Login() {
   const [data, setData] = useState({ email: "", password: "" });
   const navigate = useNavigate()
   const [toast, setToast] = useState(null)
 
-  const submitData = async()=>{
+  const submitData = async () => {
     const response = await apiFunction(loginUserApi, [], data, "post", false)
-    if(response.success){
-        localStorage.setItem("token", response.token)
-        navigate("/home")
-    }else{
-        setToast({message: response.message, type: "error"})
+    if (response.success) {
+      localStorage.setItem("token", response.token)
+      localStorage.setItem("schoolId", response.user.schoolId)
+      navigate("/home")
+    } else {
+      setToast({ message: response.message, type: "error" })
     }
   }
 
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/home")
+    }
+  }, [])
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-500 via-orange-400 to-amber-300 relative overflow-hidden">
-        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       {/* Background Blur Circle */}
       <div className="absolute w-96 h-96 bg-white/20 rounded-full blur-3xl top-[-100px] left-[-100px]" />
       <div className="absolute w-96 h-96 bg-orange-300/30 rounded-full blur-3xl bottom-[-120px] right-[-120px]" />

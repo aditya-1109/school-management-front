@@ -6,7 +6,7 @@ import {
     CalendarCheck, Settings, LogOut, ChevronDown, ChevronRight,
     UserCog, Building2, UsersRound, FileText, CreditCard, Key, ClipboardList,
     ShieldCheck, Bell, Activity, UserPlus, Shield, Mail, Calendar, // Added UserPlus, Shield, Mail, Calendar
-    InfoIcon
+    InfoIcon,BookOpen, Bus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -119,12 +119,27 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             ]
         },
         {
+            id: 'Library',
+            title: 'Library',
+            icon: BookOpen,
+            type: 'single',
+            path: "/home/libraryManagement",
+          
+        },
+        {
             id: 'Attendance',
             title: 'Attendance',
             icon: CalendarCheck,
             path: "/home/attendance",
             type: 'single',
             
+        },
+        {
+            id: 'Bus',
+            title: 'Bus Management',
+            icon: Bus,
+            path: "/home/busManagement",
+            type: 'single',
         },
     ];
 

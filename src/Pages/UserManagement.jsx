@@ -16,7 +16,11 @@ const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
 const UserManagement = () => {
 
     const dispatch = useDispatch();
-    const { users, classes } = useSelector((state) => state.getData)
+    const { users: allUsers, classes: allClasses } = useSelector((state) => state.getData)
+    const schoolId = localStorage.getItem("schoolId")
+
+    const users = useMemo(() => allUsers?.filter(u => String(u.schoolId) === String(schoolId)), [allUsers, schoolId]);
+    const classes = useMemo(() => allClasses?.filter(c => String(c.schoolId) === String(schoolId)), [allClasses, schoolId]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchStudentQuery, setSearchStudentQuery] = useState('');
     const [teacherTableOpen, setTeachettableOpen] = useState(null)
@@ -26,21 +30,21 @@ const UserManagement = () => {
     const [csvData, setCsvData] = useState([]);
     const [uploading, setUploading] = useState(false);
     const [openCSVModal, setCSVModal] = useState(false)
-    const [newUser, setNewUser] = useState({ name: '', email: '', password: "", phone: "", type: "principal", address: "", links: { fb: "", insta: "", linkdIn: "", twitter: "" }, documents: { aadhar: "", pan: "" }, connections: [] });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: "", phone: "", type: "principal", address: "", links: { fb: "", insta: "", linkdIn: "", twitter: "" }, documents: { aadhar: "", pan: "", tc: "", idCard: "" }, connections: [], schoolId: schoolId });
 
 
     useEffect(() => {
 
         if (dispatch) {
-            if (!users) {
+            if (!allUsers) {
 
                 dispatch(getUserRedux())
             }
-            if (!classes) {
+            if (!allClasses) {
                 dispatch(getClassesRedux())
             }
         }
-    }, [dispatch])
+    }, [dispatch, allUsers, allClasses])
 
     const usersType = useMemo(() => {
         if (users) {
@@ -67,10 +71,12 @@ const UserManagement = () => {
 
         setUploading(true);
 
+        const payloadWithSchoolId = csvData.map(data => ({ ...data, schoolId }));
+
         const response = await apiFunction(
             createBulkUserApi,
             [],
-            csvData,
+            payloadWithSchoolId,
             "post",
             true
         );
@@ -126,7 +132,7 @@ const UserManagement = () => {
     const handleAdd = async () => {
 
         console.log("Creating user with data:", newUser);
-        const response = await apiFunction(createUserApi, [], newUser, "post", false);
+        const response = await apiFunction(createUserApi, [], newUser, "post", true);
         if (response.success) {
 
             setIsModalOpen(false);
@@ -141,7 +147,7 @@ const UserManagement = () => {
 
     const openEditModal = (id) => {
         const selected = usersType.filter((user) => user.id === id)
-        setNewUser({ ...selected[0], password: "" })
+        setNewUser({ ...selected[0], password: "",schoolId })
         setIsModalOpen(true)
         setEditingUser(true)
     }
@@ -260,7 +266,7 @@ const UserManagement = () => {
                         <button onClick={() => {
                             setIsModalOpen(true);
                             setEditingUser(false)
-                            setNewUser({ name: '', email: '', password: "", phone: "", type: type, address: "", links: { fb: "", insta: "", linkdIn: "", twitter: "" }, documents: { aadhar: "", pan: "" }, connections: [] })
+                            setNewUser({ name: '', email: '', password: "", phone: "", type: type, address: "", links: { fb: "", insta: "", linkdIn: "", twitter: "" }, documents: { aadhar: "", pan: "", tc: "", idCard: "" }, connections: [], schoolId: schoolId })
                         }} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 shadow-sm">
                             <Plus size={20} /> Add {type}
                         </button>
@@ -552,105 +558,77 @@ const UserManagement = () => {
                                 </h3>
 
                                 <div className="grid sm:grid-cols-2 gap-6">
+                                    {((type === "student") 
+                                        ? [
+                                            { key: "aadhar", label: "Aadhar Card" },
+                                            { key: "pan", label: "Pan Card" },
+                                            { key: "tc", label: "Transfer Certificate" },
+                                            { key: "idCard", label: "ID Card" }
+                                          ]
+                                        : [
+                                            { key: "aadhar", label: "Aadhar Card" },
+                                            { key: "pan", label: "Pan Card" }
+                                          ]
+                                    ).map((doc) => (
+                                        <div key={doc.key} className="flex flex-col gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                                            <label className="text-sm font-medium text-slate-700">
+                                                {doc.label}
+                                            </label>
 
-                                    {/* Aadhar */}
-                                    <div className="flex flex-col gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
-                                        <label className="text-sm font-medium text-slate-700">
-                                            Aadhar Card
-                                        </label>
+                                            <input
+                                                type="file"
+                                                className="file-style"
+                                                onChange={(e) =>
+                                                    setNewUser({
+                                                        ...newUser,
+                                                        documents: {
+                                                            ...newUser.documents,
+                                                            [doc.key]: e.target.files[0], // store file only
+                                                        },
+                                                    })
+                                                }
+                                            />
 
-                                        <input
-                                            type="file"
-                                            className="file-style"
-                                            onChange={(e) =>
-                                                setNewUser({
-                                                    ...newUser,
-                                                    documents: {
-                                                        ...newUser.documents,
-                                                        aadhar: e.target.files[0], // store file only
-                                                    },
-                                                })
-                                            }
-                                        />
+                                            {newUser?.documents?.[doc.key] && (
+                                                <div className="flex justify-between items-center text-sm text-slate-600">
+                                                    <span className="truncate max-w-[150px]">
+                                                        {typeof newUser.documents[doc.key] === "string" ? "Uploaded" : newUser.documents[doc.key].name}
+                                                    </span>
 
-                                        {newUser?.documents?.aadhar && (
-                                            <div className="flex justify-between items-center text-sm text-slate-600">
-                                                <span className="truncate max-w-[150px]">
-                                                    {newUser.documents.aadhar.name}
-                                                </span>
+                                                    {typeof newUser.documents[doc.key] === "string" ? (
+                                                        <a
+                                                            href={newUser.documents[doc.key]}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="px-3 py-1 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium"
+                                                        >
+                                                            View
+                                                        </a>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            className="px-3 py-1 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                                                            onClick={async () => {
+                                                                const uploadedUrl = await handleFileUpload(
+                                                                    newUser.documents[doc.key]
+                                                                );
 
-                                                <button
-                                                    type="button"
-                                                    className="px-3 py-1 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-                                                    onClick={async () => {
-                                                        const uploadedUrl = await handleFileUpload(
-                                                            newUser.documents.aadhar
-                                                        );
-
-                                                        setNewUser({
-                                                            ...newUser,
-                                                            documents: {
-                                                                ...newUser.documents,
-                                                                aadhar: uploadedUrl,
-                                                            },
-                                                        });
-                                                    }}
-                                                >
-                                                    Upload
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* PAN */}
-                                    <div className="flex flex-col gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
-                                        <label className="text-sm font-medium text-slate-700">
-                                            Pan Card
-                                        </label>
-
-                                        <input
-                                            type="file"
-                                            className="file-style"
-                                            onChange={(e) =>
-                                                setNewUser({
-                                                    ...newUser,
-                                                    documents: {
-                                                        ...newUser.documents,
-                                                        pan: e.target.files[0], // store file only
-                                                    },
-                                                })
-                                            }
-                                        />
-
-                                        {newUser?.documents?.pan && (
-                                            <div className="flex justify-between items-center text-sm text-slate-600">
-                                                <span className="truncate max-w-[150px]">
-                                                    {newUser.documents.pan.name}
-                                                </span>
-
-                                                <button
-                                                    type="button"
-                                                    className="px-3 py-1 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-                                                    onClick={async () => {
-                                                        const uploadedUrl = await handleFileUpload(
-                                                            newUser.documents.pan
-                                                        );
-
-                                                        setNewUser({
-                                                            ...newUser,
-                                                            documents: {
-                                                                ...newUser.documents,
-                                                                pan: uploadedUrl,
-                                                            },
-                                                        });
-                                                    }}
-                                                >
-                                                    Upload
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-
+                                                                setNewUser({
+                                                                    ...newUser,
+                                                                    documents: {
+                                                                        ...newUser.documents,
+                                                                        [doc.key]: uploadedUrl,
+                                                                    },
+                                                                });
+                                                            }}
+                                                        >
+                                                            Upload
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
